@@ -1,0 +1,2409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Syringe Reading Trainer</title>
+
+<style>
+
+body{
+    font-family:Arial,Helvetica,sans-serif;
+    margin:20px;
+    background:#f5f5f5;
+}
+
+h1{
+    text-align:center;
+}
+
+#mainContainer{
+    max-width:1400px;
+    margin:auto;
+}
+
+#topBar{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:12px;
+    margin-bottom:20px;
+}
+
+.moduleBtn{
+    width:260px;
+    padding:12px 18px;
+    font-size:16px;
+    cursor:pointer;
+    border:none;
+    background:#1976d2;
+    color:white;
+    border-radius:6px;
+}
+
+.moduleBtn{
+    padding:10px 18px;
+    font-size:16px;
+    cursor:pointer;
+    border:none;
+    background:#1976d2;
+    color:white;
+    border-radius:6px;
+}
+
+.moduleBtn:hover{
+    background:#1565c0;
+}
+
+#statusBar{
+    margin-top:10px;
+    margin-bottom:20px;
+    font-size:18px;
+    text-align:center;
+}
+
+#questionArea{
+    background:white;
+    padding:20px;
+    border-radius:8px;
+    margin-bottom:20px;
+    box-shadow:0 0 5px rgba(0,0,0,.15);
+}
+
+#questionText{
+    font-size:26px;
+    text-align:center;
+    margin-bottom:10px;
+}
+
+#feedback{
+    text-align:center;
+    font-size:20px;
+    font-weight:bold;
+    min-height:30px;
+}
+
+.correct{
+    color:green;
+}
+
+.incorrect{
+    color:red;
+}
+
+#syringeContainer{
+    display:flex;
+    justify-content:center;
+    margin-top:20px;
+    margin-bottom:20px;
+}
+
+#controls{
+    text-align:center;
+    margin-top:10px;
+}
+
+.actionBtn{
+    padding:12px 20px;
+    margin:5px;
+    cursor:pointer;
+    font-size:16px;
+    border:none;
+    border-radius:6px;
+    background:#4caf50;
+    color:white;
+}
+
+.actionBtn:hover{
+    background:#388e3c;
+}
+
+#answerBox{
+    text-align:center;
+    margin-top:15px;
+}
+
+#typedAnswer{
+    width:150px;
+    font-size:22px;
+    padding:6px;
+    text-align:center;
+}
+
+#moduleInfo{
+    text-align:center;
+    margin-bottom:10px;
+    font-size:18px;
+}
+
+#summaryScreen{
+    display:none;
+    background:white;
+    padding:30px;
+    border-radius:8px;
+    margin-top:20px;
+}
+
+#reviewArea{
+    margin-top:20px;
+}
+
+svg{
+    user-select:none;
+}
+
+#fluid{
+    fill:#4da6ff;
+}
+
+#plungerHandle{
+    cursor:grab;
+}
+
+#plungerHandle:active{
+    cursor:grabbing;
+}
+
+#footerWatermark{
+    text-align:center;
+    margin-top:30px;
+    padding:12px;
+    border-top:1px solid #ddd;
+    color:#888;
+    font-size:12px;
+    opacity:0.65;
+    user-select:none;
+}
+
+
+
+</style>
+</head>
+
+<body>
+
+<div id="mainContainer">
+
+<h1>Drug Prep Practice - Syringe Reading Simulator</h1>
+
+<div id="homeScreen">
+
+<h2 style="text-align:center;">
+Select Training Module
+</h2>
+
+<div id="topBar">
+
+<button class="moduleBtn" onclick="startModule(1)">
+Mode 1<br>
+Draw Up Volume
+</button>
+
+<button class="moduleBtn" onclick="startModule(2)">
+Mode 2<br>
+Single Dose
+</button>
+
+<button class="moduleBtn" onclick="startModule(3)">
+Mode 3<br>
+Three Doses from One Syringe
+</button>
+
+<button class="moduleBtn" onclick="startModule(4)">
+Mode 4<br>
+Read Syringe Volume
+</button>
+
+</div>
+
+</div>
+
+<div id="gameScreen" style="display:none;">
+
+<button
+class="actionBtn"
+onclick="goHome()">
+
+← Home
+
+</button>
+
+<div id="statusBar">
+
+Questions Correct:
+<span id="correctCount">0</span>
+
+|
+
+Question
+<span id="questionNumber">0</span>
+
+/
+
+<span id="questionTotal">10</span>
+
+</div>
+
+<div id="questionArea">
+
+<div id="moduleInfo">
+
+Choose a module to begin
+
+</div>
+
+<div id="questionText">
+
+Question will appear here
+
+</div>
+
+<div id="feedback"></div>
+<div id="module3TableArea"
+style="display:none;
+margin-top:15px;">
+
+<table
+id="module3Table"
+border="1"
+style="
+margin:auto;
+border-collapse:collapse;
+text-align:center;
+min-width:500px;">
+
+<tr>
+<th>Dose</th>
+<th>Your Answer</th>
+<th>Correct Answer</th>
+</tr>
+
+<tr>
+<td>1st Dose</td>
+<td id="userDose1">-</td>
+<td id="correctDose1">-</td>
+</tr>
+
+<tr>
+<td>2nd Dose</td>
+<td id="userDose2">-</td>
+<td id="correctDose2">-</td>
+</tr>
+
+<tr>
+<td>3rd Dose</td>
+<td id="userDose3">-</td>
+<td id="correctDose3">-</td>
+</tr>
+
+</table>
+
+</div>
+<div id="syringeContainer">
+
+<svg
+id="syringeSVG"
+width="1300"
+height="280"
+viewBox="0 0 1300 280">
+
+<!-- SCALE AREA -->
+
+<g id="scaleGroup"></g>
+
+<!-- BARREL -->
+
+<rect
+x="120"
+y="70"
+width="1000"
+height="60"
+fill="white"
+stroke="black"
+stroke-width="2"/>
+
+<!-- FLUID -->
+
+<rect
+id="fluid"
+x="120"
+y="70"
+width="0"
+height="60"/>
+
+<!-- Correct answer marker -->
+
+<line
+id="correctMarker"
+x1="0"
+y1="55"
+x2="0"
+y2="145"
+stroke="darkred"
+stroke-width="5"
+style="display:none;"/>
+
+<!-- NEEDLE SIDE -->
+
+<rect
+x="80"
+y="90"
+width="40"
+height="20"
+fill="#666"/>
+
+<line
+x1="20"
+y1="100"
+x2="80"
+y2="100"
+stroke="black"
+stroke-width="2"/>
+
+<!-- PLUNGER LINE -->
+
+<rect
+id="plungerFace"
+x="120"
+y="60"
+width="8"
+height="80"
+fill="black"/>
+
+<!-- PLUNGER SHAFT -->
+
+<rect
+id="plungerShaft"
+x="120"
+y="92"
+width="120"
+height="16"
+fill="#666"/>
+
+<!-- HANDLE -->
+
+<g id="plungerHandle">
+
+<rect
+x="0"
+y="75"
+width="40"
+height="50"
+fill="#444"/>
+
+<rect
+x="-20"
+y="88"
+width="80"
+height="24"
+fill="#444"/>
+
+</g>
+
+</svg>
+
+</div>
+
+<div id="answerBox">
+
+<input
+type="number"
+id="typedAnswer"
+placeholder="Answer"
+style="display:none;">
+
+</div>
+
+<div id="controls">
+
+<button
+class="actionBtn"
+id="checkBtn">
+Check Answer
+</button>
+
+<button
+class="actionBtn"
+id="nextBtn">
+Next Question
+</button>
+
+<button
+class="actionBtn"
+id="resetPlungerBtn"
+style="display:none;">
+Reset Plunger
+</button>
+
+
+<button
+class="actionBtn"
+id="dose1Btn"
+style="display:none;">
+Submit First Dose
+</button>
+
+<button
+class="actionBtn"
+id="dose2Btn"
+style="display:none;">
+Submit Second Dose
+</button>
+
+<button
+class="actionBtn"
+id="dose3Btn"
+style="display:none;">
+Submit Third Dose
+</button>
+
+<button
+class="actionBtn"
+id="module3PrevBtn"
+style="display:none;">
+Previous Dose
+</button>
+
+<button
+class="actionBtn"
+id="module3CheckBtn"
+style="display:none;">
+Submit Answer
+</button>
+
+</div>
+
+</div>
+
+<div id="summaryScreen">
+
+<h2>Session Complete</h2>
+
+<div id="summaryText"></div>
+
+<div id="reviewArea"></div>
+
+</div>
+
+</div>
+
+</div>
+
+<div id="footerWatermark">
+    Created by Brandon Trejo | Version 1.0 | 2026
+</div>
+
+<script>
+
+/* ---------------------------------------
+CONFIGURATION
+--------------------------------------- */
+
+const BARREL_X = 120;
+const BARREL_WIDTH = 1000;
+
+const MAX_VOLUME = 1.00;
+const NOTCHES = 100;
+
+/* ---------------------------------------
+DRAW SCALE
+--------------------------------------- */
+
+const scaleGroup =
+document.getElementById("scaleGroup");
+
+for(let i=0;i<=100;i++){
+
+    let x =
+    BARREL_X +
+    (i * (BARREL_WIDTH/100));
+
+    let tickHeight;
+
+    if(i % 10 === 0){
+        tickHeight = 60;
+    }
+    else if(i % 5 === 0){
+        tickHeight = 40;
+    }
+    else{
+        tickHeight = 25;
+    }
+
+    let line =
+    document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "line"
+    );
+
+    line.setAttribute("x1",x);
+    line.setAttribute("x2",x);
+    line.setAttribute("y1",150);
+    line.setAttribute(
+        "y2",
+        150 + tickHeight
+    );
+
+    line.setAttribute("stroke","black");
+    line.setAttribute("stroke-width","1");
+
+    scaleGroup.appendChild(line);
+
+    if(i % 10 === 0 && i !== 0){
+
+        let label =
+        document.createElementNS(
+            "http://www.w3.org/2000/svg",
+            "text"
+        );
+
+        label.setAttribute("x",x-10);
+        label.setAttribute("y",145);
+
+        label.setAttribute(
+            "font-size",
+            "18"
+        );
+
+        label.textContent =
+        (i/100).toFixed(1);
+
+        scaleGroup.appendChild(label);
+    }
+}
+
+let mlLabel =
+document.createElementNS(
+    "http://www.w3.org/2000/svg",
+    "text"
+);
+
+mlLabel.setAttribute("x",1140);
+mlLabel.setAttribute("y",145);
+mlLabel.setAttribute("font-size","18");
+mlLabel.textContent="mL";
+
+scaleGroup.appendChild(mlLabel);
+
+/* ---------------------------------------
+PART 2 GOES BELOW THIS LINE
+--------------------------------------- */
+
+/* =======================================
+SYRINGE STATE
+======================================= */
+
+let currentVolume = 0.00;
+
+let dragging = false;
+
+let dragOffset = 0;
+
+let syringeSVG =
+document.getElementById("syringeSVG");
+
+let fluid =
+document.getElementById("fluid");
+
+let plungerFace =
+document.getElementById("plungerFace");
+
+let plungerShaft =
+document.getElementById("plungerShaft");
+
+let plungerHandle =
+document.getElementById("plungerHandle");
+
+let correctMarker =
+document.getElementById("correctMarker");
+
+/* =======================================
+VOLUME <-> PIXEL CONVERSION
+======================================= */
+
+function volumeToX(volume){
+
+    return BARREL_X +
+    (
+        volume *
+        BARREL_WIDTH
+    );
+
+}
+
+function xToVolume(x){
+
+    let volume =
+    (x - BARREL_X) /
+    BARREL_WIDTH;
+
+    volume =
+    Math.max(
+        0,
+        Math.min(
+            1,
+            volume
+        )
+    );
+
+    return volume;
+
+}
+
+/* =======================================
+MOVE SYRINGE GRAPHICS
+======================================= */
+
+function setVolume(volume){
+
+    volume =
+    Math.max(
+        0,
+        Math.min(
+            1,
+            volume
+        )
+    );
+
+    currentVolume = volume;
+
+    let x =
+    volumeToX(volume);
+
+    fluid.setAttribute(
+        "width",
+        x - BARREL_X
+    );
+
+    plungerFace.setAttribute(
+        "x",
+        x - 4
+    );
+
+    plungerShaft.setAttribute(
+        "x",
+        x
+    );
+
+    plungerShaft.setAttribute(
+        "width",
+        120
+    );
+
+    plungerHandle.setAttribute(
+        "transform",
+        `translate(${x+120},0)`
+    );
+
+}
+/* =======================================
+SNAP TO NOTCHES
+======================================= */
+
+function snapVolume(volume){
+
+    return (
+        Math.round(volume * 100)
+        / 100
+    );
+
+}
+
+/* =======================================
+MOUSE POSITION
+======================================= */
+
+function getSVGMouse(evt){
+
+    let pt =
+    syringeSVG.createSVGPoint();
+
+    pt.x = evt.clientX;
+    pt.y = evt.clientY;
+
+    return pt.matrixTransform(
+        syringeSVG
+        .getScreenCTM()
+        .inverse()
+    );
+
+}
+
+/* =======================================
+START DRAG
+======================================= */
+
+function startDrag(e){
+
+    if(currentModule === 4){
+        return;
+    }
+
+    dragging = true;
+
+    let pt =
+    getSVGMouse(e);
+
+    let plungerX =
+    volumeToX(currentVolume);
+
+    dragOffset =
+    pt.x - plungerX;
+
+}
+
+plungerHandle.addEventListener(
+"mousedown",
+startDrag
+);
+
+plungerFace.addEventListener(
+"mousedown",
+startDrag
+);
+
+plungerShaft.addEventListener(
+"mousedown",
+startDrag
+);
+
+/* =======================================
+DRAGGING
+======================================= */
+
+window.addEventListener(
+"mousemove",
+function(e){
+
+    if(!dragging){
+        return;
+    }
+
+    let pt =
+    getSVGMouse(e);
+
+    let volume =
+    xToVolume(
+        pt.x - dragOffset
+    );
+
+    setVolume(volume);
+
+});
+
+/* =======================================
+RELEASE AND SNAP
+======================================= */
+
+window.addEventListener(
+"mouseup",
+function(){
+
+    if(!dragging){
+        return;
+    }
+
+    dragging = false;
+
+    currentVolume =
+    snapVolume(
+        currentVolume
+    );
+
+    setVolume(
+        currentVolume
+    );
+
+});
+
+/* =======================================
+TOUCH SUPPORT
+======================================= */
+
+syringeSVG.addEventListener(
+"touchmove",
+function(e){
+
+    if(!dragging){
+        return;
+    }
+
+    e.preventDefault();
+
+    let touch =
+    e.touches[0];
+
+    let fakeEvent = {
+
+        clientX:
+        touch.clientX,
+
+        clientY:
+        touch.clientY
+
+    };
+
+    let pt =
+    getSVGMouse(
+        fakeEvent
+    );
+
+    let volume =
+    xToVolume(
+	pt.x - dragOffset
+    );
+
+    setVolume(volume);
+
+},
+{
+    passive:false
+}
+);
+
+syringeSVG.addEventListener(
+"touchstart",
+function(e){
+
+    if(currentModule === 4){
+        return;
+    }
+
+    dragging = true;
+
+    let touch =
+    e.touches[0];
+
+    let fakeEvent = {
+
+        clientX:
+        touch.clientX,
+
+        clientY:
+        touch.clientY
+
+    };
+
+    let pt =
+    getSVGMouse(
+        fakeEvent
+    );
+
+    let plungerX =
+    volumeToX(
+        currentVolume
+    );
+
+    dragOffset =
+    pt.x - plungerX;
+
+});
+
+/* =======================================
+HELPERS
+======================================= */
+
+function randomInt(min,max){
+
+    return Math.floor(
+        Math.random() *
+        (max-min+1)
+    ) + min;
+
+}
+
+function randomVolume(){
+
+    return (
+        randomInt(0,100)
+        / 100
+    );
+
+}
+
+/* =======================================
+DISPLAY FORMATTING
+======================================= */
+
+function volumeTextML(v){
+
+    return v.toFixed(2)
+    + " mL";
+
+}
+
+function volumeTextUL(v){
+
+    return Math.round(
+        v * 1000
+    ) + " µL";
+
+}
+
+/* =======================================
+RANDOM UNIT GENERATOR
+======================================= */
+
+function randomUnit(){
+
+    return Math.random() < 0.5
+    ? "mL"
+    : "uL";
+
+}
+
+function formatVolume(v,unit){
+
+    if(unit === "mL"){
+
+        return volumeTextML(v);
+
+    }
+
+    return volumeTextUL(v);
+
+}
+
+/* =======================================
+QUESTION STORAGE
+======================================= */
+
+let currentModule = 0;
+
+let currentQuestion = 0;
+
+let totalQuestions = 10;
+
+let correctAnswers = 0;
+
+let missedQuestions = [];
+
+let reviewMode = false;
+
+let reviewQuestions = [];
+
+let reviewIndex = 0;
+
+let activeQuestion = null;
+
+/* =======================================
+UI REFERENCES
+======================================= */
+
+const questionText =
+document.getElementById(
+    "questionText"
+);
+
+const feedback =
+document.getElementById(
+    "feedback"
+);
+
+const correctCount =
+document.getElementById(
+    "correctCount"
+);
+
+const questionNumber =
+document.getElementById(
+    "questionNumber"
+);
+
+const questionTotal =
+document.getElementById(
+    "questionTotal"
+);
+
+const typedAnswer =
+document.getElementById(
+    "typedAnswer"
+);
+
+
+const summaryScreen =
+document.getElementById(
+    "summaryScreen"
+);
+
+const moduleInfo =
+document.getElementById(
+    "moduleInfo"
+);
+
+/* =======================================
+RESET FEEDBACK
+======================================= */
+
+function clearFeedback(){
+
+    feedback.textContent = "";
+
+    feedback.className = "";
+
+}
+
+/* =======================================
+UPDATE SCORE UI
+======================================= */
+
+function updateScoreDisplay(){
+
+    correctCount.textContent =
+    correctAnswers;
+
+    questionNumber.textContent =
+    currentQuestion;
+
+    questionTotal.textContent =
+    totalQuestions;
+
+}
+
+/* =======================================
+RESET SESSION
+======================================= */
+
+function resetSession(){
+
+    currentQuestion = 0;
+
+    correctAnswers = 0;
+
+    missedQuestions = [];
+
+    reviewMode = false;
+
+    activeQuestion = null;
+
+    summaryScreen.style.display =
+    "none";
+
+    clearFeedback();
+
+    updateScoreDisplay();
+
+}
+
+/* =======================================
+START POSITION
+======================================= */
+
+setVolume(0.00);
+
+/* =======================================
+PART 3 STARTS BELOW THIS LINE
+======================================= */
+
+const checkBtn = document.getElementById("checkBtn");
+const nextBtn = document.getElementById("nextBtn");
+const resetPlungerBtn = document.getElementById("resetPlungerBtn");
+const summaryText = document.getElementById("summaryText");
+const reviewArea = document.getElementById("reviewArea");
+const dose1Btn = document.getElementById("dose1Btn");
+
+const dose2Btn =document.getElementById("dose2Btn");
+
+const dose3Btn =document.getElementById("dose3Btn");
+
+const module3PrevBtn =
+document.getElementById(
+"module3PrevBtn"
+);
+
+const module3CheckBtn =
+document.getElementById(
+"module3CheckBtn"
+);
+const module3TableArea =document.getElementById("module3TableArea");
+
+const homeScreen =document.getElementById("homeScreen");
+
+const gameScreen =document.getElementById("gameScreen");
+
+let module3Step = 0;
+let module3Answers = [];
+let resetVolume = 0;
+/* =======================================
+MODULE START
+======================================= */
+
+function startModule(module){
+
+    homeScreen.style.display =
+    "none";
+
+    gameScreen.style.display =
+    "block";
+
+    currentModule = module;
+
+    resetSession();
+
+    if(module === 3){
+
+        totalQuestions = 3;
+
+    }
+    else{
+
+        totalQuestions = 5;
+
+    }
+
+    updateScoreDisplay();
+
+    generateQuestion();
+
+}
+
+
+function goHome(){
+
+    gameScreen.style.display =
+    "none";
+
+    homeScreen.style.display =
+    "block";
+
+    summaryScreen.style.display =
+    "none";
+
+    reviewMode = false;
+
+    currentQuestion = 0;
+
+    correctAnswers = 0;
+
+    missedQuestions = [];
+
+    clearFeedback();
+
+    setVolume(0);
+
+    questionText.textContent =
+    "Question will appear here";
+
+    moduleInfo.textContent =
+    "Choose a module";
+
+    updateScoreDisplay();
+
+}
+
+/* =======================================
+QUESTION GENERATOR
+======================================= */
+
+function generateQuestion(){
+
+    clearFeedback();
+
+    plungerHandle.style.opacity =
+    "1";
+
+    plungerHandle.style.cursor =
+    "grab";
+
+    correctMarker.style.display =
+    "none";
+
+    summaryScreen.style.display =
+    "none";
+
+    currentQuestion++;
+
+    updateScoreDisplay();
+
+    typedAnswer.style.display = "none";
+
+    resetPlungerBtn.style.display = "none";
+
+    module3TableArea.style.display = "none";
+    module3TableArea.style.display = "none";
+
+    dose1Btn.style.display = "none";
+    dose2Btn.style.display = "none";
+    dose3Btn.style.display = "none";
+    module3PrevBtn.style.display = "none";
+    module3CheckBtn.style.display = "none";
+
+    nextBtn.style.display =
+    "none";
+
+    checkBtn.style.display =
+    "inline-block";
+
+    if(currentModule === 1){
+        buildModule1();
+    }
+
+    if(currentModule === 2){
+        buildModule2();
+    }
+
+    if(currentModule === 3){
+        buildModule3();
+    }
+
+    if(currentModule === 4){
+        buildModule4();
+    }
+
+}
+
+/* =======================================
+MODULE 1
+DRAW UP VOLUME
+======================================= */
+
+function buildModule1(){
+
+    let target =
+    randomVolume();
+
+    let unit =
+    randomUnit();
+
+    activeQuestion = {
+        answer:target
+    };
+
+    setVolume(0);
+
+    moduleInfo.textContent =
+    "Mode 1 - Draw Up Volume";
+
+    questionText.textContent =
+    "Draw up " +
+    formatVolume(target,unit);
+
+}
+
+/* =======================================
+MODULE 2
+SINGLE DOSE
+======================================= */
+
+function buildModule2(){
+
+    let start =
+    (randomInt(20,100))/100;
+
+    let dose =
+    (randomInt(1,start*100))/100;
+
+    let final =
+    snapVolume(start-dose);
+
+    let unit =
+    randomUnit();
+
+    activeQuestion = {
+
+        start:start,
+        dose:dose,
+        unit:unit,
+        answer:final
+
+    };
+
+    resetVolume = start;
+
+    setVolume(start);
+
+    resetPlungerBtn.style.display =
+    "inline-block";
+
+    moduleInfo.textContent =
+    "Mode 2 - Single Dose";
+
+    questionText.innerHTML =
+
+    "<b>Starting Volume:</b> " +
+    volumeTextML(start) +
+
+    "<br><br>" +
+
+    "<b>Give Dose:</b> " +
+    formatVolume(dose,unit) +
+
+    "<br><br>" +
+
+    "Move plunger to final volume.";
+
+}
+
+/* =======================================
+MODULE 3
+THREE DOSES
+======================================= */
+
+function buildModule3(){
+
+    moduleInfo.textContent =
+    "Mode 3 - Three Doses from One Syringe";
+
+    let start =
+    (randomInt(60,100))/100;
+
+    let dose1 =
+    randomInt(5,20)/100;
+
+    let dose2 =
+    randomInt(5,20)/100;
+
+    let dose3 =
+    randomInt(5,20)/100;
+
+    while(
+        dose1 + dose2 + dose3 >= start
+    ){
+
+        dose1 =
+        randomInt(5,20)/100;
+
+        dose2 =
+        randomInt(5,20)/100;
+
+        dose3 =
+        randomInt(5,20)/100;
+
+    }
+
+    activeQuestion = {
+
+        start:start,
+
+        doses:[
+            dose1,
+            dose2,
+            dose3
+        ],
+
+        answers:[
+
+            snapVolume(start-dose1),
+
+            snapVolume(start-dose1-dose2),
+
+            snapVolume(start-dose1-dose2-dose3)
+
+        ]
+
+    };
+
+    resetVolume = start;
+
+    setVolume(start);
+
+    module3Step = 0;
+
+    module3Answers = [];
+
+    module3TableArea.style.display =
+    "block";
+
+    document.getElementById(
+    "userDose1").textContent = "-";
+
+    document.getElementById(
+    "userDose2").textContent = "-";
+
+    document.getElementById(
+    "userDose3").textContent = "-";
+
+    document.getElementById(
+    "correctDose1").textContent = "-";
+
+    document.getElementById(
+    "correctDose2").textContent = "-";
+
+    document.getElementById(
+    "correctDose3").textContent = "-";
+
+    dose1Btn.style.display =
+    "inline-block";
+
+    dose2Btn.style.display =
+    "none";
+
+    dose3Btn.style.display =
+    "none";
+
+    module3PrevBtn.style.display =
+    "none";
+
+    module3CheckBtn.style.display =
+    "none";
+
+    checkBtn.style.display =
+    "none";
+
+    nextBtn.style.display =
+    "none";
+
+    resetPlungerBtn.style.display =
+    "inline-block";
+
+    updateModule3Question();
+
+}
+
+
+function updateModule3Question(){
+
+    questionText.innerHTML =
+
+    "<b>Starting Volume:</b> " +
+    volumeTextML(activeQuestion.start) +
+
+    "<br><br>" +
+
+    "<b>Dose 1:</b> " +
+    volumeTextML(activeQuestion.doses[0]) +
+
+    "<br>" +
+
+    "<b>Dose 2:</b> " +
+    volumeTextML(activeQuestion.doses[1]) +
+
+    "<br>" +
+
+    "<b>Dose 3:</b> " +
+    volumeTextML(activeQuestion.doses[2]) +
+
+    "<br><br>";
+
+    if(module3Step === 0){
+
+        questionText.innerHTML +=
+        "<b>Current Step:</b> Dose 1";
+
+    }
+    else if(module3Step === 1){
+
+        questionText.innerHTML +=
+        "<b>Current Step:</b> Dose 2";
+
+    }
+    else if(module3Step === 2){
+
+        questionText.innerHTML +=
+        "<b>Current Step:</b> Dose 3";
+
+    }
+
+}
+
+/* =======================================
+MODULE 4
+READ VOLUME
+======================================= */
+
+function buildModule4(){
+
+    let volume =
+    randomVolume();
+
+    let unit =
+    randomUnit();
+
+    activeQuestion = {
+        answer:volume,
+        unit:unit
+    };
+
+    setVolume(volume);
+
+    plungerHandle.style.opacity =
+    "0.5";
+
+    plungerHandle.style.cursor =
+    "default";
+
+    typedAnswer.style.display =
+    "inline-block";
+
+    typedAnswer.value = "";
+
+    moduleInfo.textContent =
+    "Mode 4 - Read Syringe Volume";
+
+    questionText.innerHTML =
+    "What volume is shown?<br><br>" +
+    "Answer in <b>" +
+    unit +
+    "</b>";
+
+}
+
+
+function rebuildModule1Review(){
+
+    setVolume(0);
+
+    moduleInfo.textContent =
+    "Review - Mode 1";
+
+    questionText.textContent =
+    "Draw up " +
+    volumeTextML(
+        activeQuestion.answer
+    );
+
+}
+
+function rebuildModule2Review(){
+
+    resetVolume =
+    activeQuestion.start;
+
+    setVolume(
+        activeQuestion.start
+    );
+
+    resetPlungerBtn.style.display =
+    "inline-block";
+
+    moduleInfo.textContent =
+    "Review - Mode 2";
+
+    questionText.innerHTML =
+
+    "<b>Starting Volume:</b> " +
+    volumeTextML(
+        activeQuestion.start
+    ) +
+
+    "<br><br>" +
+
+    "<b>Give Dose:</b> " +
+
+    formatVolume(
+        activeQuestion.dose,
+        activeQuestion.unit
+    ) +
+
+    "<br><br>" +
+
+    "Move plunger to final volume.";
+
+}
+
+function rebuildModule3Review(){
+
+    moduleInfo.textContent =
+    "Review - Mode 3";
+
+    module3Step = 0;
+
+    module3Answers = [];
+
+    resetVolume =
+    activeQuestion.start;
+
+    setVolume(
+        activeQuestion.start
+    );
+
+    module3TableArea.style.display =
+    "block";
+
+    document.getElementById(
+    "userDose1").textContent = "-";
+
+    document.getElementById(
+    "userDose2").textContent = "-";
+
+    document.getElementById(
+    "userDose3").textContent = "-";
+
+    document.getElementById(
+    "correctDose1").textContent = "-";
+
+    document.getElementById(
+    "correctDose2").textContent = "-";
+
+    document.getElementById(
+    "correctDose3").textContent = "-";
+
+    dose1Btn.style.display =
+    "inline-block";
+
+    resetPlungerBtn.style.display =
+    "inline-block";
+
+    checkBtn.style.display =
+    "none";
+
+    updateModule3Question();
+
+}
+
+function rebuildModule4Review(){
+
+    setVolume(
+        activeQuestion.answer
+    );
+
+    typedAnswer.style.display =
+    "inline-block";
+
+    typedAnswer.value = "";
+
+    moduleInfo.textContent =
+    "Review - Mode 4";
+
+    questionText.innerHTML =
+
+    "What volume is shown?<br><br>" +
+
+    "Answer in <b>" +
+
+    activeQuestion.unit +
+
+    "</b>";
+
+}
+
+/* =======================================
+CHECK ANSWER
+======================================= */
+
+checkBtn.addEventListener(
+"click",
+function(){
+
+    if(currentModule === 1){
+
+        let correct =
+        currentVolume ===
+        activeQuestion.answer;
+
+        gradeQuestion(correct);
+
+    }
+
+    else if(currentModule === 2){
+
+        let correct =
+        currentVolume ===
+        activeQuestion.answer;
+
+        gradeQuestion(correct);
+
+    }
+
+    else if(currentModule === 4){
+
+        let answer =
+        Number(
+            typedAnswer.value
+        );
+
+        let expected;
+
+        if(
+            activeQuestion.unit
+            === "mL"
+        ){
+            expected =
+            Number(
+                activeQuestion.answer
+                .toFixed(2)
+            );
+        }
+        else{
+
+            expected =
+            Math.round(
+                activeQuestion.answer
+                *1000
+            );
+
+        }
+
+        let correct =
+        answer === expected;
+
+        gradeQuestion(correct);
+
+    }
+
+});
+
+/* =======================================
+GLOBAL ENTER KEY SUPPORT
+======================================= */
+
+document.addEventListener(
+"keydown",
+function(e){
+
+    if(e.key !== "Enter"){
+        return;
+    }
+
+    /* -----------------------------
+       MODULE 3 SPECIAL FLOW
+    ------------------------------ */
+
+    if(currentModule === 3){
+
+        if(
+            dose1Btn.style.display !==
+            "none"
+        ){
+            dose1Btn.click();
+            return;
+        }
+
+        if(
+            dose2Btn.style.display !==
+            "none"
+        ){
+            dose2Btn.click();
+            return;
+        }
+
+        if(
+            dose3Btn.style.display !==
+            "none"
+        ){
+            dose3Btn.click();
+            return;
+        }
+
+        if(
+            module3CheckBtn.style.display !==
+            "none"
+        ){
+            module3CheckBtn.click();
+            return;
+        }
+
+        if(
+            nextBtn.style.display !==
+            "none"
+        ){
+            nextBtn.click();
+            return;
+        }
+
+    }
+
+    /* -----------------------------
+       MODULES 1,2,4
+    ------------------------------ */
+
+    else{
+
+        if(
+            checkBtn.style.display !==
+            "none"
+        ){
+
+            checkBtn.click();
+            return;
+
+        }
+
+        if(
+            nextBtn.style.display !==
+            "none"
+        ){
+
+            nextBtn.click();
+            return;
+
+        }
+
+    }
+
+}
+);
+
+/* =======================================
+MODULE 3 BUTTONS
+======================================= */
+
+dose1Btn.addEventListener(
+"click",
+function(){
+
+    module3Answers[0] =
+    currentVolume;
+
+    document.getElementById(
+        "userDose1"
+    ).textContent =
+    volumeTextML(currentVolume);
+
+    module3Step = 1;
+
+    dose1Btn.style.display =
+    "none";
+
+    dose2Btn.style.display =
+    "inline-block";
+
+    module3PrevBtn.style.display =
+    "inline-block";
+
+    resetVolume =
+    activeQuestion.answers[0];
+
+    updateModule3Question();
+
+}
+);
+
+dose2Btn.addEventListener(
+"click",
+function(){
+
+    module3Answers[1] =
+    currentVolume;
+
+    document.getElementById(
+        "userDose2"
+    ).textContent =
+    volumeTextML(currentVolume);
+
+    module3Step = 2;
+
+    dose2Btn.style.display =
+    "none";
+
+    dose3Btn.style.display =
+    "inline-block";
+
+    resetVolume =
+    activeQuestion.answers[1];
+
+    updateModule3Question();
+
+}
+);
+
+dose3Btn.addEventListener(
+"click",
+function(){
+
+    module3Answers[2] =
+    currentVolume;
+
+    document.getElementById(
+        "userDose3"
+    ).textContent =
+    volumeTextML(currentVolume);
+
+    module3Step = 3;
+
+    dose3Btn.style.display =
+    "none";
+
+    module3CheckBtn.style.display =
+    "inline-block";
+
+    updateModule3Question();
+
+    questionText.innerHTML +=
+
+    "<br><br><b>All doses entered.</b>";
+
+}
+);
+
+
+module3PrevBtn.addEventListener(
+"click",
+function(){
+
+    if(module3Step === 1){
+
+        module3Step = 0;
+
+        dose1Btn.style.display =
+        "inline-block";
+
+        dose2Btn.style.display =
+        "none";
+
+        module3PrevBtn.style.display =
+        "none";
+
+        setVolume(
+            activeQuestion.start
+        );
+
+    }
+
+    else if(module3Step === 2){
+
+        module3Step = 1;
+
+        dose2Btn.style.display =
+        "inline-block";
+
+        dose3Btn.style.display =
+        "none";
+
+        setVolume(
+            activeQuestion.answers[0]
+        );
+
+    }
+
+    else if(module3Step === 3){
+
+        module3Step = 2;
+
+        dose3Btn.style.display =
+        "inline-block";
+
+        module3CheckBtn.style.display =
+        "none";
+
+        setVolume(
+            activeQuestion.answers[1]
+        );
+
+    }
+
+    updateModule3Question();
+
+}
+);
+
+module3CheckBtn.addEventListener(
+"click",
+function(){
+
+    let allCorrect = true;
+
+    for(
+        let i=0;
+        i<3;
+        i++
+    ){
+
+        document.getElementById(
+            "correctDose" + (i+1)
+        ).textContent =
+        volumeTextML(
+            activeQuestion.answers[i]
+        );
+
+        if(
+            module3Answers[i]
+            !==
+            activeQuestion.answers[i]
+        ){
+            allCorrect = false;
+        }
+
+    }
+
+    module3CheckBtn.style.display =
+    "none";
+
+    gradeQuestion(
+        allCorrect
+    );
+
+}
+);
+
+resetPlungerBtn.addEventListener(
+"click",
+function(){
+
+    setVolume(
+        resetVolume
+    );
+
+});
+
+/* =======================================
+GRADE QUESTION
+======================================= */
+
+function gradeQuestion(correct){
+
+    if(correct){
+
+        feedback.textContent =
+        "Correct";
+
+        feedback.className =
+        "correct";
+
+        correctAnswers++;
+
+        correctMarker.style.display =
+        "none";
+
+    }
+    else{
+
+        feedback.className =
+        "incorrect";
+
+        /* -----------------------
+           MODULE 1
+        ----------------------- */
+
+        if(currentModule === 1){
+
+            feedback.innerHTML =
+
+            "Incorrect<br><br>" +
+
+            "Correct answer: " +
+
+            volumeTextML(
+                activeQuestion.answer
+            );
+
+            let x =
+            volumeToX(
+                activeQuestion.answer
+            );
+
+            correctMarker.setAttribute(
+                "x1",
+                x
+            );
+
+            correctMarker.setAttribute(
+                "x2",
+                x
+            );
+
+            correctMarker.style.display =
+            "block";
+
+        }
+
+        /* -----------------------
+           MODULE 2
+        ----------------------- */
+
+        else if(currentModule === 2){
+
+            feedback.innerHTML =
+
+            "Incorrect<br><br>" +
+
+            "Final volume should be: " +
+
+            volumeTextML(
+                activeQuestion.answer
+            );
+
+            let x =
+            volumeToX(
+                activeQuestion.answer
+            );
+
+            correctMarker.setAttribute(
+                "x1",
+                x
+            );
+
+            correctMarker.setAttribute(
+                "x2",
+                x
+            );
+
+            correctMarker.style.display =
+            "block";
+
+        }
+
+        /* -----------------------
+           MODULE 4
+        ----------------------- */
+
+        else if(currentModule === 4){
+
+            let expected;
+
+            if(
+                activeQuestion.unit ===
+                "mL"
+            ){
+
+                expected =
+                activeQuestion.answer
+                .toFixed(2)
+                + " mL";
+
+            }
+            else{
+
+                expected =
+                Math.round(
+                    activeQuestion.answer *
+                    1000
+                )
+                + " µL";
+
+            }
+
+            feedback.innerHTML =
+
+            "Incorrect<br><br>" +
+
+            "Correct answer: " +
+
+            expected;
+
+            correctMarker.style.display =
+            "none";
+
+        }
+
+        /* -----------------------
+           MODULE 3
+        ----------------------- */
+
+        else{
+
+            feedback.textContent =
+            "Incorrect";
+
+            correctMarker.style.display =
+            "none";
+
+        }
+
+        missedQuestions.push(
+            structuredClone(
+                activeQuestion
+            )
+        );
+
+    }
+
+    updateScoreDisplay();
+
+    checkBtn.style.display =
+    "none";
+
+    nextBtn.style.display =
+    "inline-block";
+
+}
+
+/* =======================================
+NEXT QUESTION
+======================================= */
+
+nextBtn.addEventListener(
+"click",
+function(){
+
+    if(
+        currentQuestion
+        >= totalQuestions
+    ){
+
+        showSummary();
+
+        return;
+
+    }
+
+    if(reviewMode){
+
+        generateReviewQuestion();
+
+    }
+    else{
+
+        generateQuestion();
+
+    }
+
+});
+
+/* =======================================
+SUMMARY
+======================================= */
+
+function showSummary(){
+
+    summaryScreen.style.display =
+    "block";
+
+    summaryText.innerHTML =
+
+    "<h3>Results</h3>" +
+
+    "Correct: " +
+    correctAnswers +
+    " / " +
+    totalQuestions +
+
+    "<br><br>" +
+
+    "Accuracy: " +
+
+    (
+        (
+            correctAnswers /
+            totalQuestions
+        ) * 100
+    ).toFixed(1)
+
+    + "%";
+
+    reviewArea.innerHTML = "";
+
+    if(
+        missedQuestions.length > 0
+    ){
+
+        let btn =
+        document.createElement(
+            "button"
+        );
+
+        btn.className =
+        "actionBtn";
+
+        btn.textContent =
+        "Review Missed Questions (" +
+        missedQuestions.length +
+        ")";
+
+        btn.onclick =
+        startReview;
+
+        reviewArea.appendChild(btn);
+
+    }
+
+}
+
+/* =======================================
+REVIEW MODE
+======================================= */
+
+function startReview(){
+
+    reviewMode = true;
+
+    reviewQuestions =
+    JSON.parse(
+        JSON.stringify(
+            missedQuestions
+        )
+    );
+
+    reviewIndex = 0;
+
+    correctAnswers = 0;
+
+    currentQuestion = 0;
+
+    totalQuestions =
+    reviewQuestions.length;
+
+    missedQuestions = [];
+
+    summaryScreen.style.display =
+    "none";
+
+    generateReviewQuestion();
+
+}
+
+function generateReviewQuestion(){
+
+    clearFeedback();
+
+    currentQuestion++;
+
+    updateScoreDisplay();
+
+    activeQuestion =
+    reviewQuestions[
+        reviewIndex
+    ];
+
+    reviewIndex++;
+
+    nextBtn.style.display =
+    "none";
+
+    checkBtn.style.display =
+    "inline-block";
+
+    typedAnswer.style.display =
+    "none";
+
+    resetPlungerBtn.style.display =
+    "none";
+
+    module3TableArea.style.display =
+    "none";
+
+    dose1Btn.style.display =
+    "none";
+
+    dose2Btn.style.display =
+    "none";
+
+    dose3Btn.style.display =
+    "none";
+
+    module3PrevBtn.style.display =
+    "none";
+
+    module3CheckBtn.style.display =
+    "none";
+
+    if(currentModule === 1){
+
+        rebuildModule1Review();
+
+    }
+
+    else if(currentModule === 2){
+
+        rebuildModule2Review();
+
+    }
+
+    else if(currentModule === 3){
+
+        rebuildModule3Review();
+
+    }
+
+    else if(currentModule === 4){
+
+        rebuildModule4Review();
+
+    }
+
+}
+
+/* =======================================
+INITIAL DISPLAY
+======================================= */
+
+updateScoreDisplay();
+
+/* =======================================
+END OF FILE
+======================================= */
+
+</script>
+</body>
+</html>
