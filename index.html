@@ -10,12 +10,14 @@
 
 body{
     font-family:Arial,Helvetica,sans-serif;
-    margin:20px;
+    margin:10px;
     background:#f5f5f5;
 }
 
 h1{
     text-align:center;
+    margin:5px 0;
+    font-size:30px;
 }
 
 #mainContainer{
@@ -65,7 +67,7 @@ h1{
 
 #questionArea{
     background:white;
-    padding:20px;
+    padding:12px;
     border-radius:8px;
     margin-bottom:20px;
     box-shadow:0 0 5px rgba(0,0,0,.15);
@@ -78,10 +80,29 @@ h1{
 }
 
 #feedback{
+    position:fixed;
+    top:50px;
+
+    left:50%;
+    transform:translateX(-50%);
+
+    z-index:9999;
+
+    background:white;
+    border:2px solid #ccc;
+    border-radius:8px;
+
+    padding:12px 20px;
+
     text-align:center;
     font-size:20px;
     font-weight:bold;
-    min-height:30px;
+
+    box-shadow:0 4px 12px rgba(0,0,0,.25);
+
+    min-width:300px;
+
+    display:none;
 }
 
 .correct{
@@ -95,8 +116,8 @@ h1{
 #syringeContainer{
     display:flex;
     justify-content:center;
-    margin-top:20px;
-    margin-bottom:20px;
+    margin-top:5px;
+    margin-bottom:5px;
 }
 
 #controls{
@@ -176,7 +197,26 @@ svg{
     user-select:none;
 }
 
+#module3Layout{
+    display:flex;
+    justify-content:center;
+    align-items:flex-start;
+    gap:30px;
+    margin-top:10px;
+}
 
+#module3DoseInfo{
+    text-align:left;
+    font-size:18px;
+    min-width:250px;
+}
+
+#module3StepLabel{
+    text-align:center;
+    font-size:20px;
+    font-weight:bold;
+    margin-top:15px;
+}
 
 </style>
 </head>
@@ -258,55 +298,65 @@ Choose a module to begin
 Question will appear here
 
 </div>
+<div id="module3Layout" style="display:none;">
 
-<div id="feedback"></div>
-<div id="module3TableArea"
-style="display:none;
-margin-top:15px;">
+    <div id="module3DoseInfo"></div>
 
-<table
-id="module3Table"
-border="1"
-style="
-margin:auto;
-border-collapse:collapse;
-text-align:center;
-min-width:500px;">
+    <div id="module3TableArea"
+         style="display:none;">
 
-<tr>
-<th>Dose</th>
-<th>Your Answer</th>
-<th>Correct Answer</th>
-</tr>
+        <table
+        id="module3Table"
+        border="1"
+        style="
+        margin:auto;
+        border-collapse:collapse;
+        text-align:center;
+        min-width:400px;">
 
-<tr>
-<td>1st Dose</td>
-<td id="userDose1">-</td>
-<td id="correctDose1">-</td>
-</tr>
+            <tr>
+                <th>Dose</th>
+                <th>Your Answer</th>
+                <th>Correct Answer</th>
+            </tr>
 
-<tr>
-<td>2nd Dose</td>
-<td id="userDose2">-</td>
-<td id="correctDose2">-</td>
-</tr>
+            <tr>
+                <td>1st Dose</td>
+                <td id="userDose1">-</td>
+                <td id="correctDose1">-</td>
+            </tr>
 
-<tr>
-<td>3rd Dose</td>
-<td id="userDose3">-</td>
-<td id="correctDose3">-</td>
-</tr>
+            <tr>
+                <td>2nd Dose</td>
+                <td id="userDose2">-</td>
+                <td id="correctDose2">-</td>
+            </tr>
 
-</table>
+            <tr>
+                <td>3rd Dose</td>
+                <td id="userDose3">-</td>
+                <td id="correctDose3">-</td>
+            </tr>
+
+        </table>
+
+    </div>
 
 </div>
+
+<div id="module3StepLabel"></div>
+
+<div id="feedback"></div>
+
 <div id="syringeContainer">
 
 <svg
 id="syringeSVG"
-width="1300"
-height="280"
-viewBox="0 0 1300 280">
+width="100%"
+height="220"
+viewBox="0 0 1300 280"
+preserveAspectRatio="xMidYMid meet">
+
 
 <!-- SCALE AREA -->
 
@@ -1042,6 +1092,9 @@ function clearFeedback(){
 
     feedback.className = "";
 
+    feedback.style.display =
+    "none";
+
 }
 
 /* =======================================
@@ -1216,18 +1269,41 @@ function generateQuestion(){
 
     updateScoreDisplay();
 
-    typedAnswer.style.display = "none";
+    typedAnswer.style.display =
+    "none";
 
-    resetPlungerBtn.style.display = "none";
+    resetPlungerBtn.style.display =
+    "none";
 
-    module3TableArea.style.display = "none";
-    module3TableArea.style.display = "none";
+    document.getElementById(
+    "module3Layout"
+    ).style.display =
+    "none";
 
-    dose1Btn.style.display = "none";
-    dose2Btn.style.display = "none";
-    dose3Btn.style.display = "none";
-    module3PrevBtn.style.display = "none";
-    module3CheckBtn.style.display = "none";
+    module3TableArea.style.display =
+    "none";
+
+    document.getElementById(
+    "module3StepLabel"
+    ).textContent = "";
+
+    dose1Btn.style.display =
+    "none";
+
+    dose2Btn.style.display =
+    "none";
+
+    dose3Btn.style.display =
+    "none";
+
+    dose3Btn.textContent =
+    "Submit Third Dose";
+
+    module3PrevBtn.style.display =
+    "none";
+
+    module3CheckBtn.style.display =
+    "none";
 
     nextBtn.style.display =
     "none";
@@ -1239,15 +1315,15 @@ function generateQuestion(){
         buildModule1();
     }
 
-    if(currentModule === 2){
+    else if(currentModule === 2){
         buildModule2();
     }
 
-    if(currentModule === 3){
+    else if(currentModule === 3){
         buildModule3();
     }
 
-    if(currentModule === 4){
+    else if(currentModule === 4){
         buildModule4();
     }
 
@@ -1386,9 +1462,13 @@ function buildModule3(){
 
             snapVolume(start-dose1),
 
-            snapVolume(start-dose1-dose2),
+            snapVolume(
+                start-dose1-dose2
+            ),
 
-            snapVolume(start-dose1-dose2-dose3)
+            snapVolume(
+                start-dose1-dose2-dose3
+            )
 
         ]
 
@@ -1402,26 +1482,37 @@ function buildModule3(){
 
     module3Answers = [];
 
+    document.getElementById(
+        "module3Layout"
+    ).style.display =
+    "flex";
+
     module3TableArea.style.display =
     "block";
 
     document.getElementById(
-    "userDose1").textContent = "-";
+        "userDose1"
+    ).textContent = "-";
 
     document.getElementById(
-    "userDose2").textContent = "-";
+        "userDose2"
+    ).textContent = "-";
 
     document.getElementById(
-    "userDose3").textContent = "-";
+        "userDose3"
+    ).textContent = "-";
 
     document.getElementById(
-    "correctDose1").textContent = "-";
+        "correctDose1"
+    ).textContent = "-";
 
     document.getElementById(
-    "correctDose2").textContent = "-";
+        "correctDose2"
+    ).textContent = "-";
 
     document.getElementById(
-    "correctDose3").textContent = "-";
+        "correctDose3"
+    ).textContent = "-";
 
     dose1Btn.style.display =
     "inline-block";
@@ -1431,6 +1522,9 @@ function buildModule3(){
 
     dose3Btn.style.display =
     "none";
+
+    dose3Btn.textContent =
+    "Submit Third Dose";
 
     module3PrevBtn.style.display =
     "none";
@@ -1451,49 +1545,65 @@ function buildModule3(){
 
 }
 
-
 function updateModule3Question(){
 
     questionText.innerHTML =
-
     "<b>Starting Volume:</b> " +
-    volumeTextML(activeQuestion.start) +
+    volumeTextML(
+        activeQuestion.start
+    );
 
-    "<br><br>" +
+    document.getElementById(
+        "module3Layout"
+    ).style.display =
+    "flex";
 
-    "<b>Dose 1:</b> " +
-    volumeTextML(activeQuestion.doses[0]) +
+    document.getElementById(
+        "module3DoseInfo"
+    ).innerHTML =
 
-    "<br>" +
+        "<b>Dose 1:</b> " +
+        volumeTextML(
+            activeQuestion.doses[0]
+        ) +
 
-    "<b>Dose 2:</b> " +
-    volumeTextML(activeQuestion.doses[1]) +
+        "<br><br>" +
 
-    "<br>" +
+        "<b>Dose 2:</b> " +
+        volumeTextML(
+            activeQuestion.doses[1]
+        ) +
 
-    "<b>Dose 3:</b> " +
-    volumeTextML(activeQuestion.doses[2]) +
+        "<br><br>" +
 
-    "<br><br>";
+        "<b>Dose 3:</b> " +
+        volumeTextML(
+            activeQuestion.doses[2]
+        );
+
+    let stepText = "";
 
     if(module3Step === 0){
-
-        questionText.innerHTML +=
-        "<b>Current Step:</b> Dose 1";
-
+        stepText =
+        "Current Step: Dose 1";
     }
     else if(module3Step === 1){
-
-        questionText.innerHTML +=
-        "<b>Current Step:</b> Dose 2";
-
+        stepText =
+        "Current Step: Dose 2";
     }
     else if(module3Step === 2){
-
-        questionText.innerHTML +=
-        "<b>Current Step:</b> Dose 3";
-
+        stepText =
+        "Current Step: Dose 3";
     }
+    else{
+        stepText =
+        "Click Submit Answer";
+    }
+
+    document.getElementById(
+        "module3StepLabel"
+    ).textContent =
+    stepText;
 
 }
 
@@ -1902,21 +2012,46 @@ function(){
 
     module3Step = 3;
 
-    dose3Btn.style.display =
-    "none";
-
-    module3CheckBtn.style.display =
-    "inline-block";
-
     updateModule3Question();
 
-    questionText.innerHTML +=
+    dose3Btn.textContent =
+    "Submit Answer";
 
-    "<br><br><b>All doses entered.</b>";
+    dose3Btn.onclick =
+    function(){
+
+        let allCorrect = true;
+
+        for(
+            let i=0;
+            i<3;
+            i++
+        ){
+
+            document.getElementById(
+                "correctDose" + (i+1)
+            ).textContent =
+            volumeTextML(
+                activeQuestion.answers[i]
+            );
+
+            if(
+                module3Answers[i] !==
+                activeQuestion.answers[i]
+            ){
+                allCorrect = false;
+            }
+
+        }
+
+        gradeQuestion(
+            allCorrect
+        );
+
+    };
 
 }
 );
-
 
 module3PrevBtn.addEventListener(
 "click",
@@ -2041,6 +2176,9 @@ function gradeQuestion(correct){
         feedback.className =
         "correct";
 
+        feedback.style.display =
+        "block";
+
         correctAnswers++;
 
         correctMarker.style.display =
@@ -2052,9 +2190,8 @@ function gradeQuestion(correct){
         feedback.className =
         "incorrect";
 
-        /* -----------------------
-           MODULE 1
-        ----------------------- */
+        feedback.style.display =
+        "block";
 
         if(currentModule === 1){
 
@@ -2087,11 +2224,6 @@ function gradeQuestion(correct){
             "block";
 
         }
-
-        /* -----------------------
-           MODULE 2
-        ----------------------- */
-
         else if(currentModule === 2){
 
             feedback.innerHTML =
@@ -2123,11 +2255,6 @@ function gradeQuestion(correct){
             "block";
 
         }
-
-        /* -----------------------
-           MODULE 4
-        ----------------------- */
-
         else if(currentModule === 4){
 
             let expected;
@@ -2166,11 +2293,6 @@ function gradeQuestion(correct){
             "none";
 
         }
-
-        /* -----------------------
-           MODULE 3
-        ----------------------- */
-
         else{
 
             feedback.textContent =
@@ -2192,6 +2314,21 @@ function gradeQuestion(correct){
     updateScoreDisplay();
 
     checkBtn.style.display =
+    "none";
+
+    dose1Btn.style.display =
+    "none";
+
+    dose2Btn.style.display =
+    "none";
+
+    dose3Btn.style.display =
+    "none";
+
+    module3PrevBtn.style.display =
+    "none";
+
+    module3CheckBtn.style.display =
     "none";
 
     nextBtn.style.display =
@@ -2319,6 +2456,9 @@ function startReview(){
     summaryScreen.style.display =
     "none";
 
+    correctMarker.style.display =
+    "none";
+
     generateReviewQuestion();
 
 }
@@ -2326,6 +2466,9 @@ function startReview(){
 function generateReviewQuestion(){
 
     clearFeedback();
+
+    correctMarker.style.display =
+    "none";
 
     currentQuestion++;
 
@@ -2350,7 +2493,9 @@ function generateReviewQuestion(){
     resetPlungerBtn.style.display =
     "none";
 
-    module3TableArea.style.display =
+    document.getElementById(
+        "module3Layout"
+    ).style.display =
     "none";
 
     dose1Btn.style.display =
@@ -2373,19 +2518,16 @@ function generateReviewQuestion(){
         rebuildModule1Review();
 
     }
-
     else if(currentModule === 2){
 
         rebuildModule2Review();
 
     }
-
     else if(currentModule === 3){
 
         rebuildModule3Review();
 
     }
-
     else if(currentModule === 4){
 
         rebuildModule4Review();
