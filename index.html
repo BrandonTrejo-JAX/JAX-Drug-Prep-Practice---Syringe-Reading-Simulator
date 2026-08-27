@@ -201,18 +201,30 @@ svg{
     user-select:none;
 }
 
+/* =======================================
+MODULE 3 LAYOUT
+======================================= */
+
 #module3Layout{
-    display:flex;
+    display:none;
     justify-content:center;
     align-items:flex-start;
     gap:30px;
     margin-top:10px;
+    width:100%;
+    box-sizing:border-box;
 }
 
 #module3DoseInfo{
     text-align:left;
     font-size:18px;
     min-width:250px;
+    box-sizing:border-box;
+}
+
+#module3TableArea{
+    display:none;
+    box-sizing:border-box;
 }
 
 #module3StepLabel{
@@ -220,6 +232,154 @@ svg{
     font-size:20px;
     font-weight:bold;
     margin-top:15px;
+}
+
+
+/* =======================================
+MODULE 3 - MOBILE / TOUCH DEVICES
+======================================= */
+
+@media (max-width:1000px),
+       (pointer: coarse) and (hover: none){
+
+    #module3Layout{
+        flex-direction:column !important;
+
+        align-items:center !important;
+        justify-content:flex-start !important;
+
+        width:100% !important;
+        max-width:100% !important;
+
+        gap:15px !important;
+        margin-top:10px !important;
+
+        box-sizing:border-box !important;
+
+        /*
+        IMPORTANT:
+        JavaScript controls visibility.
+        This rule only controls the layout
+        when Module 3 is displayed.
+        */
+    }
+    /* Starting volume + dose information */
+    #module3DoseInfo{
+        display:block !important;
+
+        width:100% !important;
+        min-width:0 !important;
+        max-width:100% !important;
+
+        text-align:center !important;
+
+        font-size:18px !important;
+        line-height:1.4 !important;
+
+        box-sizing:border-box !important;
+    }
+
+    /* Dose results table */
+    #module3TableArea{
+        width:100% !important;
+        min-width:0 !important;
+        max-width:100% !important;
+
+        overflow-x:auto !important;
+        overflow-y:hidden !important;
+
+        margin:0 auto !important;
+
+        box-sizing:border-box !important;
+
+        /*
+        IMPORTANT:
+        Do NOT set display here.
+
+        JavaScript controls whether the table
+        is visible.
+        */
+    }
+
+    #module3Table{
+        width:100% !important;
+        min-width:0 !important;
+        max-width:100% !important;
+
+        margin:0 auto !important;
+
+        font-size:14px !important;
+
+        table-layout:fixed !important;
+
+        box-sizing:border-box !important;
+    }
+
+    #module3Table th,
+    #module3Table td{
+        padding:6px 4px !important;
+        white-space:nowrap !important;
+        overflow:hidden !important;
+    }
+
+    #module3Table th:nth-child(1),
+    #module3Table td:nth-child(1){
+        width:30% !important;
+    }
+
+    #module3Table th:nth-child(2),
+    #module3Table td:nth-child(2){
+        width:35% !important;
+    }
+
+    #module3Table th:nth-child(3),
+    #module3Table td:nth-child(3){
+        width:35% !important;
+    }
+
+    /* Current Step */
+    #module3StepLabel{
+        width:100% !important;
+        max-width:100% !important;
+
+        text-align:center !important;
+
+        font-size:18px !important;
+
+        margin-top:10px !important;
+        margin-bottom:10px !important;
+
+        box-sizing:border-box !important;
+    }
+
+    /* Syringe */
+    #syringeContainer{
+        width:100% !important;
+        max-width:100% !important;
+
+        overflow:hidden !important;
+
+        box-sizing:border-box !important;
+    }
+
+    #syringeSVG{
+        width:100% !important;
+        max-width:100% !important;
+
+        height:auto !important;
+
+        display:block !important;
+    }
+
+    /* Buttons */
+    #controls{
+        width:100% !important;
+        box-sizing:border-box !important;
+    }
+
+    .actionBtn{
+        max-width:100%;
+    }
 }
 
 </style>
@@ -765,38 +925,55 @@ function snapVolume(volume){
 }
 
 /* =======================================
-MOUSE POSITION
+POINTER POSITION / MOBILE-SAFE SVG MAPPING
 ======================================= */
 
-function getSVGMouse(evt){
+/*
+    IMPORTANT:
+    Do NOT calculate SVG coordinates using:
 
-    const rect =
-    syringeSVG.getBoundingClientRect();
+        (clientX - rect.left) / rect.width
 
-    const viewBox =
-    syringeSVG.viewBox.baseVal;
+    because the SVG uses:
+
+        preserveAspectRatio="xMidYMid meet"
+
+    On mobile, the displayed SVG can have scaling/letterboxing
+    that makes the HTML rectangle different from the actual
+    SVG coordinate system.
+
+    Instead, getScreenCTM() converts the phone/desktop screen
+    coordinates directly into SVG viewBox coordinates.
+*/
+
+function getSVGPoint(clientX, clientY){
+
+    const point =
+        syringeSVG.createSVGPoint();
+
+    point.x = clientX;
+    point.y = clientY;
+
+    const svgPoint =
+        point.matrixTransform(
+            syringeSVG
+                .getScreenCTM()
+                .inverse()
+        );
 
     return {
-
-        x:
-        ((evt.clientX - rect.left) /
-        rect.width) *
-        viewBox.width,
-
-        y:
-        ((evt.clientY - rect.top) /
-        rect.height) *
-        viewBox.height
-
+        x: svgPoint.x,
+        y: svgPoint.y
     };
 
 }
 
+
 /* =======================================
-START DRAG
+START POINTER DRAG
 ======================================= */
 
-function startDrag(e){
+function startPointerDrag(e){
 
     if(currentModule === 4){
         return;
@@ -804,88 +981,47 @@ function startDrag(e){
 
     dragging = true;
 
-    let pt =
-    getSVGMouse(e);
+    /*
+        Capture the pointer so movement continues to be
+        received even if the user's finger moves slightly
+        outside the plunger element.
+    */
 
-    let plungerX =
-    volumeToX(currentVolume);
+    try{
+        e.currentTarget.setPointerCapture(e.pointerId);
+    }
+    catch(err){
+        /* Some browsers may not support pointer capture */
+    }
+
+    const pt =
+        getSVGPoint(
+            e.clientX,
+            e.clientY
+        );
+
+    const plungerX =
+        volumeToX(currentVolume);
+
+    /*
+        Preserve the point where the user grabbed the
+        plunger instead of forcing the plunger center
+        underneath the finger.
+    */
 
     dragOffset =
-    pt.x - plungerX;
+        pt.x - plungerX;
+
+    e.preventDefault();
 
 }
 
-plungerHandle.addEventListener(
-"mousedown",
-startDrag
-);
-
-plungerFace.addEventListener(
-"mousedown",
-startDrag
-);
-
-plungerShaft.addEventListener(
-"mousedown",
-startDrag
-);
 
 /* =======================================
-DRAGGING
+POINTER DRAGGING
 ======================================= */
 
-window.addEventListener(
-"mousemove",
-function(e){
-
-    if(!dragging){
-        return;
-    }
-
-    let pt =
-    getSVGMouse(e);
-
-    let volume =
-    xToVolume(
-        pt.x - dragOffset
-    );
-
-    setVolume(volume);
-
-});
-
-/* =======================================
-RELEASE AND SNAP
-======================================= */
-
-window.addEventListener(
-"mouseup",
-function(){
-
-    if(!dragging){
-        return;
-    }
-
-    dragging = false;
-
-    currentVolume =
-    snapVolume(
-        currentVolume
-    );
-
-    setVolume(
-        currentVolume
-    );
-
-});
-
-/* =======================================
-TOUCH SUPPORT
-======================================= */
-
-syringeSVG.addEventListener(
-"touchmove",
-function(e){
+function movePointerDrag(e){
 
     if(!dragging){
         return;
@@ -893,74 +1029,126 @@ function(e){
 
     e.preventDefault();
 
-    let touch =
-    e.touches[0];
+    const pt =
+        getSVGPoint(
+            e.clientX,
+            e.clientY
+        );
 
-    let fakeEvent = {
-
-        clientX:
-        touch.clientX,
-
-        clientY:
-        touch.clientY
-
-    };
-
-    let pt =
-    getSVGMouse(
-        fakeEvent
-    );
-
-    let volume =
-    xToVolume(
-	pt.x - dragOffset
-    );
+    const volume =
+        xToVolume(
+            pt.x - dragOffset
+        );
 
     setVolume(volume);
 
-},
-{
-    passive:false
 }
-);
 
-syringeSVG.addEventListener(
-"touchstart",
-function(e){
 
-    if(currentModule === 4){
+/* =======================================
+END POINTER DRAG
+======================================= */
+
+function endPointerDrag(e){
+
+    if(!dragging){
         return;
     }
 
-    dragging = true;
+    dragging = false;
 
-    let touch =
-    e.touches[0];
+    /*
+        Snap to the nearest 0.01 mL notch after releasing.
+    */
 
-    let fakeEvent = {
+    currentVolume =
+        snapVolume(
+            currentVolume
+        );
 
-        clientX:
-        touch.clientX,
-
-        clientY:
-        touch.clientY
-
-    };
-
-    let pt =
-    getSVGMouse(
-        fakeEvent
-    );
-
-    let plungerX =
-    volumeToX(
+    setVolume(
         currentVolume
     );
 
-    dragOffset =
-    pt.x - plungerX;
+    try{
 
-});
+        if(
+            e.currentTarget &&
+            e.currentTarget.releasePointerCapture
+        ){
+
+            e.currentTarget.releasePointerCapture(
+                e.pointerId
+            );
+
+        }
+
+    }
+    catch(err){
+        /* Ignore pointer capture release errors */
+    }
+
+}
+
+
+/* =======================================
+POINTER EVENT LISTENERS
+======================================= */
+
+/*
+    Pointer Events handle:
+
+        - Desktop mouse
+        - Mobile touchscreen
+        - Stylus
+
+    This replaces the old separate mouse + touch
+    event system.
+*/
+
+plungerHandle.addEventListener(
+    "pointerdown",
+    startPointerDrag
+);
+
+plungerFace.addEventListener(
+    "pointerdown",
+    startPointerDrag
+);
+
+plungerShaft.addEventListener(
+    "pointerdown",
+    startPointerDrag
+);
+
+
+/*
+    Movement is attached to the window so the drag
+    continues even if the finger leaves the plunger.
+*/
+
+window.addEventListener(
+    "pointermove",
+    movePointerDrag,
+    {
+        passive:false
+    }
+);
+
+
+/*
+    Release can happen anywhere on the screen.
+*/
+
+window.addEventListener(
+    "pointerup",
+    endPointerDrag
+);
+
+window.addEventListener(
+    "pointercancel",
+    endPointerDrag
+);
 
 /* =======================================
 HELPERS
