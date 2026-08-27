@@ -411,7 +411,7 @@ Single Dose
 
 <button class="moduleBtn" onclick="startModule(3)">
 Mode 3<br>
-Three Doses from One Syringe
+Five Doses from One Syringe
 </button>
 
 <button class="moduleBtn" onclick="startModule(4)">
@@ -479,27 +479,39 @@ Question will appear here
         min-width:400px;">
 
             <tr>
-                <th>Dose</th>
+                <th>Mouse</th>
                 <th>Your Answer</th>
                 <th>Correct Answer</th>
             </tr>
 
             <tr>
-                <td>1st Dose</td>
+                <td>Mouse 1</td>
                 <td id="userDose1">-</td>
                 <td id="correctDose1">-</td>
             </tr>
 
             <tr>
-                <td>2nd Dose</td>
+                <td>Mouse 2</td>
                 <td id="userDose2">-</td>
                 <td id="correctDose2">-</td>
             </tr>
 
             <tr>
-                <td>3rd Dose</td>
+                <td>Mouse 3</td>
                 <td id="userDose3">-</td>
                 <td id="correctDose3">-</td>
+            </tr>
+
+            <tr>
+                <td>Mouse 4</td>
+                <td id="userDose4">-</td>
+                <td id="correctDose4">-</td>
+            </tr>
+
+            <tr>
+                <td>Mouse 5</td>
+                <td id="userDose5">-</td>
+                <td id="correctDose5">-</td>
             </tr>
 
         </table>
@@ -655,35 +667,42 @@ Reset Plunger
 class="actionBtn"
 id="dose1Btn"
 style="display:none;">
-Submit First Dose
+Submit Mouse 1
 </button>
 
 <button
 class="actionBtn"
 id="dose2Btn"
 style="display:none;">
-Submit Second Dose
+Submit Mouse 2
 </button>
 
 <button
 class="actionBtn"
 id="dose3Btn"
 style="display:none;">
-Submit Third Dose
+Submit Mouse 3
+</button>
+
+<button
+class="actionBtn"
+id="dose4Btn"
+style="display:none;">
+Submit Mouse 4
+</button>
+
+<button
+class="actionBtn"
+id="dose5Btn"
+style="display:none;">
+Submit Mouse 5
 </button>
 
 <button
 class="actionBtn"
 id="module3PrevBtn"
 style="display:none;">
-Previous Dose
-</button>
-
-<button
-class="actionBtn"
-id="module3CheckBtn"
-style="display:none;">
-Submit Answer
+Previous Mouse
 </button>
 
 </div>
@@ -1354,22 +1373,26 @@ const nextBtn = document.getElementById("nextBtn");
 const resetPlungerBtn = document.getElementById("resetPlungerBtn");
 const summaryText = document.getElementById("summaryText");
 const reviewArea = document.getElementById("reviewArea");
-const dose1Btn = document.getElementById("dose1Btn");
+const dose1Btn =
+document.getElementById("dose1Btn");
 
-const dose2Btn =document.getElementById("dose2Btn");
+const dose2Btn =
+document.getElementById("dose2Btn");
 
-const dose3Btn =document.getElementById("dose3Btn");
+const dose3Btn =
+document.getElementById("dose3Btn");
+
+const dose4Btn =
+document.getElementById("dose4Btn");
+
+const dose5Btn =
+document.getElementById("dose5Btn");
 
 const module3PrevBtn =
-document.getElementById(
-"module3PrevBtn"
-);
+document.getElementById("module3PrevBtn");
 
-const module3CheckBtn =
-document.getElementById(
-"module3CheckBtn"
-);
-const module3TableArea =document.getElementById("module3TableArea");
+const module3TableArea =
+document.getElementById("module3TableArea");
 
 const homeScreen =document.getElementById("homeScreen");
 
@@ -1496,13 +1519,13 @@ function generateQuestion(){
     dose3Btn.style.display =
     "none";
 
-    dose3Btn.textContent =
-    "Submit Third Dose";
-
-    module3PrevBtn.style.display =
+    dose4Btn.style.display =
     "none";
 
-    module3CheckBtn.style.display =
+    dose5Btn.style.display =
+    "none";
+
+    module3PrevBtn.style.display =
     "none";
 
     nextBtn.style.display =
@@ -1616,37 +1639,122 @@ MODULE 3
 THREE DOSES
 ======================================= */
 
+/* =======================================
+MODULE 3
+FIVE MICE - ONE CAGE
+======================================= */
+
 function buildModule3(){
 
     moduleInfo.textContent =
-    "Mode 3 - Three Doses from One Syringe";
+    "Mode 3 - Five Mice from One Syringe";
+
+    /*
+        Starting volume is large enough for
+        five similar mouse doses.
+
+        0.75 - 1.00 mL starting volume.
+    */
 
     let start =
-    (randomInt(60,100))/100;
+    randomInt(75,100) / 100;
+
+    /*
+        First mouse dose:
+        0.10 - 0.20 mL
+    */
 
     let dose1 =
-    randomInt(5,20)/100;
+    randomInt(10,20) / 100;
 
-    let dose2 =
-    randomInt(5,20)/100;
+    /*
+        Each following mouse receives a dose
+        within +/- 0.05 mL of the previous dose.
+    */
 
-    let dose3 =
-    randomInt(5,20)/100;
+    let dose2;
+    let dose3;
+    let dose4;
+    let dose5;
 
-    while(
-        dose1 + dose2 + dose3 >= start
-    ){
-
-        dose1 =
-        randomInt(5,20)/100;
+    do{
 
         dose2 =
-        randomInt(5,20)/100;
-
-        dose3 =
-        randomInt(5,20)/100;
+        snapVolume(
+            dose1 +
+            randomInt(-5,5) / 100
+        );
 
     }
+    while(
+        dose2 < 0.05 ||
+        dose2 > 0.25
+    );
+
+
+    do{
+
+        dose3 =
+        snapVolume(
+            dose2 +
+            randomInt(-5,5) / 100
+        );
+
+    }
+    while(
+        dose3 < 0.05 ||
+        dose3 > 0.25
+    );
+
+
+    do{
+
+        dose4 =
+        snapVolume(
+            dose3 +
+            randomInt(-5,5) / 100
+        );
+
+    }
+    while(
+        dose4 < 0.05 ||
+        dose4 > 0.25
+    );
+
+
+    do{
+
+        dose5 =
+        snapVolume(
+            dose4 +
+            randomInt(-5,5) / 100
+        );
+
+    }
+    while(
+        dose5 < 0.05 ||
+        dose5 > 0.25
+    );
+
+
+    /*
+        Make sure all five doses fit inside
+        the starting syringe volume.
+    */
+
+    while(
+        dose1 +
+        dose2 +
+        dose3 +
+        dose4 +
+        dose5 >= start
+    ){
+
+        start =
+        randomInt(75,100) / 100;
+
+    }
+
 
     activeQuestion = {
 
@@ -1655,32 +1763,65 @@ function buildModule3(){
         doses:[
             dose1,
             dose2,
-            dose3
+            dose3,
+            dose4,
+            dose5
         ],
 
         answers:[
 
-            snapVolume(start-dose1),
-
             snapVolume(
-                start-dose1-dose2
+                start - dose1
             ),
 
             snapVolume(
-                start-dose1-dose2-dose3
+                start -
+                dose1 -
+                dose2
+            ),
+
+            snapVolume(
+                start -
+                dose1 -
+                dose2 -
+                dose3
+            ),
+
+            snapVolume(
+                start -
+                dose1 -
+                dose2 -
+                dose3 -
+                dose4
+            ),
+
+            snapVolume(
+                start -
+                dose1 -
+                dose2 -
+                dose3 -
+                dose4 -
+                dose5
             )
 
         ]
 
     };
 
-    resetVolume = start;
+
+    resetVolume =
+    start;
 
     setVolume(start);
 
     module3Step = 0;
 
     module3Answers = [];
+
+
+    /*
+        Show Module 3 layout
+    */
 
     document.getElementById(
         "module3Layout"
@@ -1690,29 +1831,33 @@ function buildModule3(){
     module3TableArea.style.display =
     "block";
 
-    document.getElementById(
-        "userDose1"
-    ).textContent = "-";
 
-    document.getElementById(
-        "userDose2"
-    ).textContent = "-";
+    /*
+        Reset answer table
+    */
 
-    document.getElementById(
-        "userDose3"
-    ).textContent = "-";
+    for(
+        let i = 1;
+        i <= 5;
+        i++
+    ){
 
-    document.getElementById(
-        "correctDose1"
-    ).textContent = "-";
+        document.getElementById(
+            "userDose" + i
+        ).textContent =
+        "-";
 
-    document.getElementById(
-        "correctDose2"
-    ).textContent = "-";
+        document.getElementById(
+            "correctDose" + i
+        ).textContent =
+        "-";
 
-    document.getElementById(
-        "correctDose3"
-    ).textContent = "-";
+    }
+
+
+    /*
+        Button states
+    */
 
     dose1Btn.style.display =
     "inline-block";
@@ -1723,13 +1868,13 @@ function buildModule3(){
     dose3Btn.style.display =
     "none";
 
-    dose3Btn.textContent =
-    "Submit Third Dose";
-
-    module3PrevBtn.style.display =
+    dose4Btn.style.display =
     "none";
 
-    module3CheckBtn.style.display =
+    dose5Btn.style.display =
+    "none";
+
+    module3PrevBtn.style.display =
     "none";
 
     checkBtn.style.display =
@@ -1741,6 +1886,7 @@ function buildModule3(){
     resetPlungerBtn.style.display =
     "inline-block";
 
+
     updateModule3Question();
 
 }
@@ -1748,57 +1894,106 @@ function buildModule3(){
 function updateModule3Question(){
 
     questionText.innerHTML =
+
     "<b>Starting Volume:</b> " +
+
     volumeTextML(
         activeQuestion.start
     );
+
 
     document.getElementById(
         "module3Layout"
     ).style.display =
     "flex";
 
+
+    /*
+        Display all five mouse doses.
+    */
+
     document.getElementById(
         "module3DoseInfo"
     ).innerHTML =
 
-        "<b>Dose 1:</b> " +
+        "<b>Mouse 1:</b> " +
         volumeTextML(
             activeQuestion.doses[0]
         ) +
 
         "<br><br>" +
 
-        "<b>Dose 2:</b> " +
+        "<b>Mouse 2:</b> " +
         volumeTextML(
             activeQuestion.doses[1]
         ) +
 
         "<br><br>" +
 
-        "<b>Dose 3:</b> " +
+        "<b>Mouse 3:</b> " +
         volumeTextML(
             activeQuestion.doses[2]
+        ) +
+
+        "<br><br>" +
+
+        "<b>Mouse 4:</b> " +
+        volumeTextML(
+            activeQuestion.doses[3]
+        ) +
+
+        "<br><br>" +
+
+        "<b>Mouse 5:</b> " +
+        volumeTextML(
+            activeQuestion.doses[4]
         );
+
+
+    /*
+        Current step indicator.
+    */
 
     let stepText = "";
 
+
     if(module3Step === 0){
+
         stepText =
-        "Current Step: Dose 1";
+        "Current Step: Mouse 1";
+
     }
     else if(module3Step === 1){
+
         stepText =
-        "Current Step: Dose 2";
+        "Current Step: Mouse 2";
+
     }
     else if(module3Step === 2){
+
         stepText =
-        "Current Step: Dose 3";
+        "Current Step: Mouse 3";
+
+    }
+    else if(module3Step === 3){
+
+        stepText =
+        "Current Step: Mouse 4";
+
+    }
+    else if(module3Step === 4){
+
+        stepText =
+        "Current Step: Mouse 5";
+
     }
     else{
+
         stepText =
-        "Click Submit Answer";
+        "Cage Complete - Submit Answer";
+
     }
+
 
     document.getElementById(
         "module3StepLabel"
@@ -1905,48 +2100,81 @@ function rebuildModule2Review(){
 function rebuildModule3Review(){
 
     moduleInfo.textContent =
-    "Review - Mode 3";
+    "Review - Mode 3 - Five Mice";
+
 
     module3Step = 0;
 
     module3Answers = [];
 
+
     resetVolume =
     activeQuestion.start;
+
 
     setVolume(
         activeQuestion.start
     );
 
+
     module3TableArea.style.display =
     "block";
 
-    document.getElementById(
-    "userDose1").textContent = "-";
 
-    document.getElementById(
-    "userDose2").textContent = "-";
+    /*
+        Reset the five-row table.
+    */
 
-    document.getElementById(
-    "userDose3").textContent = "-";
+    for(
+        let i = 1;
+        i <= 5;
+        i++
+    ){
 
-    document.getElementById(
-    "correctDose1").textContent = "-";
+        document.getElementById(
+            "userDose" + i
+        ).textContent =
+        "-";
 
-    document.getElementById(
-    "correctDose2").textContent = "-";
+        document.getElementById(
+            "correctDose" + i
+        ).textContent =
+        "-";
 
-    document.getElementById(
-    "correctDose3").textContent = "-";
+    }
+
+
+    /*
+        Reset buttons.
+    */
 
     dose1Btn.style.display =
     "inline-block";
+
+    dose2Btn.style.display =
+    "none";
+
+    dose3Btn.style.display =
+    "none";
+
+    dose4Btn.style.display =
+    "none";
+
+    dose5Btn.style.display =
+    "none";
+
+    module3PrevBtn.style.display =
+    "none";
 
     resetPlungerBtn.style.display =
     "inline-block";
 
     checkBtn.style.display =
     "none";
+
+    nextBtn.style.display =
+    "none";
+
 
     updateModule3Question();
 
@@ -2087,10 +2315,26 @@ function(e){
         }
 
         if(
-            module3CheckBtn.style.display !==
+            dose4Btn.style.display !==
             "none"
         ){
-            module3CheckBtn.click();
+            dose4Btn.click();
+            return;
+        }
+
+        if(
+            dose5Btn.style.display !==
+            "none"
+        ){
+            dose5Btn.click();
+            return;
+        }
+
+        if(
+            nextBtn.style.display !==
+            "none"
+        ){
+            nextBtn.click();
             return;
         }
 
@@ -2137,7 +2381,13 @@ function(e){
 
 /* =======================================
 MODULE 3 BUTTONS
+FIVE MOUSE CAGE
 ======================================= */
+
+
+/* ---------------------------------------
+MOUSE 1
+--------------------------------------- */
 
 dose1Btn.addEventListener(
 "click",
@@ -2146,12 +2396,15 @@ function(){
     module3Answers[0] =
     currentVolume;
 
+
     document.getElementById(
         "userDose1"
     ).textContent =
     volumeTextML(currentVolume);
 
+
     module3Step = 1;
+
 
     dose1Btn.style.display =
     "none";
@@ -2162,13 +2415,20 @@ function(){
     module3PrevBtn.style.display =
     "inline-block";
 
+
     resetVolume =
     activeQuestion.answers[0];
+
 
     updateModule3Question();
 
 }
 );
+
+
+/* ---------------------------------------
+MOUSE 2
+--------------------------------------- */
 
 dose2Btn.addEventListener(
 "click",
@@ -2177,12 +2437,15 @@ function(){
     module3Answers[1] =
     currentVolume;
 
+
     document.getElementById(
         "userDose2"
     ).textContent =
     volumeTextML(currentVolume);
 
+
     module3Step = 2;
+
 
     dose2Btn.style.display =
     "none";
@@ -2190,13 +2453,20 @@ function(){
     dose3Btn.style.display =
     "inline-block";
 
+
     resetVolume =
     activeQuestion.answers[1];
+
 
     updateModule3Question();
 
 }
 );
+
+
+/* ---------------------------------------
+MOUSE 3
+--------------------------------------- */
 
 dose3Btn.addEventListener(
 "click",
@@ -2205,59 +2475,160 @@ function(){
     module3Answers[2] =
     currentVolume;
 
+
     document.getElementById(
         "userDose3"
     ).textContent =
     volumeTextML(currentVolume);
 
+
     module3Step = 3;
+
+
+    dose3Btn.style.display =
+    "none";
+
+    dose4Btn.style.display =
+    "inline-block";
+
+
+    resetVolume =
+    activeQuestion.answers[2];
+
 
     updateModule3Question();
 
-    dose3Btn.textContent =
-    "Submit Answer";
+}
+);
 
-    dose3Btn.onclick =
-    function(){
 
-        let allCorrect = true;
+/* ---------------------------------------
+MOUSE 4
+--------------------------------------- */
 
-        for(
-            let i=0;
-            i<3;
-            i++
-        ){
+dose4Btn.addEventListener(
+"click",
+function(){
 
-            document.getElementById(
-                "correctDose" + (i+1)
-            ).textContent =
-            volumeTextML(
-                activeQuestion.answers[i]
-            );
+    module3Answers[3] =
+    currentVolume;
 
-            if(
-                module3Answers[i] !==
-                activeQuestion.answers[i]
-            ){
-                allCorrect = false;
-            }
 
-        }
+    document.getElementById(
+        "userDose4"
+    ).textContent =
+    volumeTextML(currentVolume);
 
-        gradeQuestion(
-            allCorrect
-        );
 
-    };
+    module3Step = 4;
+
+
+    dose4Btn.style.display =
+    "none";
+
+    dose5Btn.style.display =
+    "inline-block";
+
+
+    resetVolume =
+    activeQuestion.answers[3];
+
+
+    updateModule3Question();
 
 }
 );
+
+
+/* ---------------------------------------
+MOUSE 5
+--------------------------------------- */
+
+dose5Btn.addEventListener(
+"click",
+function(){
+
+    module3Answers[4] =
+    currentVolume;
+
+
+    document.getElementById(
+        "userDose5"
+    ).textContent =
+    volumeTextML(currentVolume);
+
+
+    module3Step = 5;
+
+
+    dose5Btn.textContent =
+    "Submit Answer";
+
+
+    /*
+        Hide Previous Mouse while submitting
+        the completed cage.
+    */
+
+    module3PrevBtn.style.display =
+    "none";
+
+
+    /*
+        Grade all five mouse doses.
+    */
+
+    let allCorrect = true;
+
+
+    for(
+        let i = 0;
+        i < 5;
+        i++
+    ){
+
+        document.getElementById(
+            "correctDose" + (i+1)
+        ).textContent =
+        volumeTextML(
+            activeQuestion.answers[i]
+        );
+
+
+        if(
+            module3Answers[i]
+            !==
+            activeQuestion.answers[i]
+        ){
+
+            allCorrect = false;
+
+        }
+
+    }
+
+
+    gradeQuestion(
+        allCorrect
+    );
+
+}
+);
+
+
+/* =======================================
+PREVIOUS MOUSE
+======================================= */
 
 module3PrevBtn.addEventListener(
 "click",
 function(){
 
     if(module3Step === 1){
+
+        /*
+            Return to Mouse 1.
+        */
 
         module3Step = 0;
 
@@ -2270,13 +2641,19 @@ function(){
         module3PrevBtn.style.display =
         "none";
 
+
         setVolume(
             activeQuestion.start
         );
 
     }
 
+
     else if(module3Step === 2){
+
+        /*
+            Return to Mouse 2.
+        */
 
         module3Step = 1;
 
@@ -2286,21 +2663,28 @@ function(){
         dose3Btn.style.display =
         "none";
 
+
         setVolume(
             activeQuestion.answers[0]
         );
 
     }
 
+
     else if(module3Step === 3){
+
+        /*
+            Return to Mouse 3.
+        */
 
         module3Step = 2;
 
         dose3Btn.style.display =
         "inline-block";
 
-        module3CheckBtn.style.display =
+        dose4Btn.style.display =
         "none";
+
 
         setVolume(
             activeQuestion.answers[1]
@@ -2308,46 +2692,30 @@ function(){
 
     }
 
-    updateModule3Question();
 
-}
-);
+    else if(module3Step === 4){
 
-module3CheckBtn.addEventListener(
-"click",
-function(){
+        /*
+            Return to Mouse 4.
+        */
 
-    let allCorrect = true;
+        module3Step = 3;
 
-    for(
-        let i=0;
-        i<3;
-        i++
-    ){
+        dose4Btn.style.display =
+        "inline-block";
 
-        document.getElementById(
-            "correctDose" + (i+1)
-        ).textContent =
-        volumeTextML(
-            activeQuestion.answers[i]
+        dose5Btn.style.display =
+        "none";
+
+
+        setVolume(
+            activeQuestion.answers[2]
         );
-
-        if(
-            module3Answers[i]
-            !==
-            activeQuestion.answers[i]
-        ){
-            allCorrect = false;
-        }
 
     }
 
-    module3CheckBtn.style.display =
-    "none";
 
-    gradeQuestion(
-        allCorrect
-    );
+    updateModule3Question();
 
 }
 );
@@ -2525,10 +2893,13 @@ function gradeQuestion(correct){
     dose3Btn.style.display =
     "none";
 
-    module3PrevBtn.style.display =
+   dose4Btn.style.display =
     "none";
 
-    module3CheckBtn.style.display =
+    dose5Btn.style.display =
+    "none";
+
+    module3PrevBtn.style.display =
     "none";
 
     nextBtn.style.display =
@@ -2707,10 +3078,13 @@ function generateReviewQuestion(){
     dose3Btn.style.display =
     "none";
 
-    module3PrevBtn.style.display =
+   dose4Btn.style.display =
     "none";
 
-    module3CheckBtn.style.display =
+    dose5Btn.style.display =
+    "none";
+
+    module3PrevBtn.style.display =
     "none";
 
     if(currentModule === 1){
